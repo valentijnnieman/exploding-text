@@ -1,12 +1,12 @@
 import React, { Component } from "react";
 
-import ExampleComponent from "exploding-text";
+import ExplodingText from "exploding-text";
 
 export default class App extends Component {
   render() {
     return (
       <div>
-        <ExampleComponent
+        <ExplodingText
           text={["Example", "Click me!"]}
           lengths={[
             [40, 44, 38, 38, 42, 40, 36],
