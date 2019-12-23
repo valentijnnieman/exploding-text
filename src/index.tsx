@@ -34,6 +34,7 @@ interface ExplodingTextProps {
   debugDraw: boolean;
   boundaries: boolean;
   position: Vector2;
+  onClick: () => void;
 }
 interface ExplodingTextState {
   text: Array<string>;
@@ -202,6 +203,7 @@ class ExplodingText extends React.PureComponent<
               y: -Math.random() * 0.02
             });
           }
+          this.props.onClick();
         }}
       />
     );
