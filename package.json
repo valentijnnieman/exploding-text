@@ -22,9 +22,7 @@
     "deploy": "gh-pages -d example/build"
   },
   "dependencies": {
-    "matter-js": "^0.14.2",
-    "pathseg": "^1.2.0",
-    "poly-decomp": "^0.3.0"
+    "matter-js": "^0.14.2"
   },
   "peerDependencies": {
     "prop-types": "^15.5.4",

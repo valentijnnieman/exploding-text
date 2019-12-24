@@ -1,18 +1,15 @@
 /**
- * @class ExampleComponent
+ * @class ExplodingText
  */
 
 import * as React from "react";
 
-// import * as Matter from "matter-js";
 const Matter = require("matter-js");
 
 const Engine = Matter.Engine,
   Composite = Matter.Composite,
   World = Matter.World,
   Bodies = Matter.Bodies;
-
-window["decomp" as any] = require("poly-decomp");
 
 const clamp = function(min: number, max: number, value: number) {
   return Math.min(Math.max(value, min), max);
@@ -96,51 +93,53 @@ class ExplodingText extends React.PureComponent<
   renderText = () => {
     let bodies = Composite.allBodies(this.engine.world);
 
-    window.requestAnimationFrame(this.renderText);
+    if (window) {
+      window.requestAnimationFrame(this.renderText);
 
-    if (this.canvasRef.current) {
-      const context = this.canvasRef.current.getContext("2d");
+      if (this.canvasRef.current) {
+        const context = this.canvasRef.current.getContext("2d");
 
-      if (context) {
-        context.fillStyle = this.props.backgroundColor;
-        context.fillRect(
-          0,
-          0,
-          this.canvasRef.current.width,
-          this.canvasRef.current.height
-        );
+        if (context) {
+          context.fillStyle = this.props.backgroundColor;
+          context.fillRect(
+            0,
+            0,
+            this.canvasRef.current.width,
+            this.canvasRef.current.height
+          );
 
-        context.beginPath();
+          context.beginPath();
 
-        let offset = 0;
-        this.state.text.forEach(t => {
-          const l = t.length;
-          for (let i = 0; i < l; i++) {
-            var vertices = bodies[offset + i].vertices;
+          let offset = 0;
+          this.state.text.forEach(t => {
+            const l = t.length;
+            for (let i = 0; i < l; i++) {
+              var vertices = bodies[offset + i].vertices;
 
-            context.moveTo(vertices[0].x, vertices[0].y);
-            context.font = `${this.props.fontSize}px Arial`;
-            context.fillStyle = this.props.color;
+              context.moveTo(vertices[0].x, vertices[0].y);
+              context.font = `${this.props.fontSize}px Arial`;
+              context.fillStyle = this.props.color;
 
-            if (this.props.debugDraw) {
-              context.strokeStyle = "magenta";
-              for (var j = 1; j < vertices.length; j += 1) {
-                context.lineTo(vertices[j].x, vertices[j].y);
+              if (this.props.debugDraw) {
+                context.strokeStyle = "magenta";
+                for (var j = 1; j < vertices.length; j += 1) {
+                  context.lineTo(vertices[j].x, vertices[j].y);
+                }
               }
+
+              context.fillText(
+                t[i],
+                bodies[offset + i].position.x - this.props.fontSize / 3.5,
+                bodies[offset + i].position.y + this.props.fontSize / 3.5
+              );
+              // context.lineTo(vertices[0].x, vertices[0].y);
             }
+            offset += l;
+          });
 
-            context.fillText(
-              t[i],
-              bodies[offset + i].position.x - this.props.fontSize / 3.5,
-              bodies[offset + i].position.y + this.props.fontSize / 3.5
-            );
-            // context.lineTo(vertices[0].x, vertices[0].y);
-          }
-          offset += l;
-        });
-
-        context.lineWidth = 1;
-        context.stroke();
+          context.lineWidth = 1;
+          context.stroke();
+        }
       }
     }
   };
@@ -203,7 +202,9 @@ class ExplodingText extends React.PureComponent<
               y: -Math.random() * 0.02
             });
           }
-          this.props.onClick();
+          if (this.props.onClick) {
+            this.props.onClick();
+          }
         }}
       />
     );
