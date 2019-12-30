@@ -81,13 +81,15 @@ class ExplodingText extends React.PureComponent<
           ? this.state.lengths[i][clamp(0, this.state.lengths[i].length - 1, j)]
           : 60;
 
-        const newBody: Matter.Body = Bodies.circle(
+        const newBody: Matter.Body = Bodies.rectangle(
           startPosition.x + j * len,
           // 0 + i * 100,
           0,
           len / 2,
+          this.props.fontSize,
           {
             collisionFilter: {
+              category: i + 1,
               mask: i + 1
             }
           }
@@ -99,7 +101,6 @@ class ExplodingText extends React.PureComponent<
     this.borders = [];
     // build text borders
     this.props.text.forEach((s, i) => {
-      console.log(i);
       const border = Bodies.rectangle(
         startPosition.x + s.length,
         startPosition.y + i * 60,
@@ -108,6 +109,7 @@ class ExplodingText extends React.PureComponent<
         {
           isStatic: true,
           collisionFilter: {
+            category: i + 1,
             mask: i + 1
           }
         }
@@ -115,6 +117,7 @@ class ExplodingText extends React.PureComponent<
       World.add(this.engine.world, [border]);
       this.borders = [...this.borders, border];
     });
+    Engine.run(this.engine);
   }
   renderText = () => {
     let bodies = Composite.allBodies(this.engine.world);
@@ -189,7 +192,11 @@ class ExplodingText extends React.PureComponent<
         this.props.width,
         40,
         {
-          isStatic: true
+          isStatic: true,
+          collisionFilter: {
+            category: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+            mask: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+          }
         }
       );
       const ceiling = Bodies.rectangle(
@@ -198,7 +205,11 @@ class ExplodingText extends React.PureComponent<
         this.props.width,
         40,
         {
-          isStatic: true
+          isStatic: true,
+          collisionFilter: {
+            category: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+            mask: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+          }
         }
       );
       const lWall = Bodies.rectangle(
@@ -207,7 +218,11 @@ class ExplodingText extends React.PureComponent<
         40,
         this.props.height,
         {
-          isStatic: true
+          isStatic: true,
+          collisionFilter: {
+            category: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+            mask: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+          }
         }
       );
       const rWall = Bodies.rectangle(
@@ -216,12 +231,15 @@ class ExplodingText extends React.PureComponent<
         40,
         this.props.height,
         {
-          isStatic: true
+          isStatic: true,
+          collisionFilter: {
+            category: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9,
+            mask: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+          }
         }
       );
       World.add(this.engine.world, [ground, ceiling, lWall, rWall]);
     }
-    Engine.run(this.engine);
     this.renderText();
     return (
       <canvas
