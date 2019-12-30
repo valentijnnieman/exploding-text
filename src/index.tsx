@@ -46,6 +46,7 @@ class ExplodingText extends React.PureComponent<
   canvasRef: React.RefObject<HTMLCanvasElement>;
   context: CanvasRenderingContext2D | null;
   engine: Matter.Engine;
+  borders: Array<Matter.Body>;
 
   static defaultProps = {
     lenghts: [],
@@ -79,15 +80,40 @@ class ExplodingText extends React.PureComponent<
         const len = this.state.lengths[i]
           ? this.state.lengths[i][clamp(0, this.state.lengths[i].length - 1, j)]
           : 60;
-        World.add(
-          this.engine.world,
-          Bodies.circle(
-            startPosition.x + j * len,
-            startPosition.y + i * 80,
-            len / 2
-          )
+
+        const newBody: Matter.Body = Bodies.circle(
+          startPosition.x + j * len,
+          // 0 + i * 100,
+          0,
+          len / 2,
+          {
+            collisionFilter: {
+              mask: i + 1
+            }
+          }
         );
+        World.add(this.engine.world, [newBody]);
       }
+    });
+
+    this.borders = [];
+    // build text borders
+    this.props.text.forEach((s, i) => {
+      console.log(i);
+      const border = Bodies.rectangle(
+        startPosition.x + s.length,
+        startPosition.y + i * 60,
+        this.props.width,
+        40,
+        {
+          isStatic: true,
+          collisionFilter: {
+            mask: i + 1
+          }
+        }
+      );
+      World.add(this.engine.world, [border]);
+      this.borders = [...this.borders, border];
     });
   }
   renderText = () => {
@@ -136,9 +162,21 @@ class ExplodingText extends React.PureComponent<
             }
             offset += l;
           });
-
           context.lineWidth = 1;
           context.stroke();
+
+          this.borders.forEach(b => {
+            context.beginPath();
+            if (this.props.debugDraw) {
+              context.strokeStyle = "magenta";
+              for (var j = 1; j < b.vertices.length; j += 1) {
+                context.lineTo(b.vertices[j].x, b.vertices[j].y);
+              }
+            }
+
+            context.lineWidth = 1;
+            context.stroke();
+          });
         }
       }
     }
@@ -183,9 +221,7 @@ class ExplodingText extends React.PureComponent<
       );
       World.add(this.engine.world, [ground, ceiling, lWall, rWall]);
     }
-    if (this.state.clicked) {
-      Engine.run(this.engine);
-    }
+    Engine.run(this.engine);
     this.renderText();
     return (
       <canvas
@@ -202,6 +238,9 @@ class ExplodingText extends React.PureComponent<
               y: -Math.random() * 0.02
             });
           }
+          this.borders.forEach(b => {
+            World.remove(this.engine.world, b);
+          });
           if (this.props.onClick) {
             this.props.onClick();
           }

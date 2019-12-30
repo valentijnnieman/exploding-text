@@ -15,7 +15,7 @@ export default class App extends Component {
           width={800}
           height={600}
           fontSize={64}
-          debugDraw={false}
+          debugDraw={true}
           boundaries={true}
         />
       </div>
